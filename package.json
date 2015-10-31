@@ -9,6 +9,10 @@
   "author": {
     "name": "John De Mott"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/heydemo/client-side-storage"
+  },
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
