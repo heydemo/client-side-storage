@@ -2,10 +2,14 @@
   "name": "client-side-storage",
   "version": "0.0.0-semantically-released",
   "description": "Simple, extensible, client-side key/value pair storage for winners, like you.",
-  "main": "src/storage-methods.js",
+  "main": "dist/storage-methods.js",
   "scripts": {
-    "commit": "git-cz",
+    "prebuild": "rm -rf dist && mkdir dist",
+    "build": "babel src/storage-methods.js -o dist/storage-methods.js",
+    "commit": "./node_modules/commitizen/bin/git-cz",
+    "start": "npm run test",
     "test": "mocha tests/tests.js -w --compilers js:babel/register",
+    "test:single": "mocha tests/tests.js --compilers js:babel/register",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": {
@@ -17,20 +21,22 @@
   },
   "license": "ISC",
   "devDependencies": {
+    "babel": "6.0.14",
     "chai": "3.4.0",
     "chai-as-promised": "5.1.0",
-    "commitizen": "2.3.0",
-    "cz-conventional-changelog": "1.1.4",
+    "codecov.io": "0.1.6",
+    "commitizen": "1.0.5",
+    "cz-conventional-changelog": "1.1.2",
+    "ghooks": "0.3.2",
     "mocha": "1.21.5",
-    "mocha-as-promised": "2.0.0",
-    "node-aop": "0.1.0",
-    "semantic-release": "^4.3.5"
+    "semantic-release": "4.3.5"
   },
   "dependencies": {
     "localStorage": "^1.0.3",
+    "node-aop": "0.1.0",
     "q": "^1.4.1"
   },
   "czConfig": {
-    "path": "node_modules/cs-convential-changelog"
+    "path": "node_modules/cz-conventional-changelog"
   }
 }
