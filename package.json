@@ -2,7 +2,7 @@
   "name": "client-side-storage",
   "version": "0.0.0-semantically-released",
   "description": "Simple, extensible, client-side key/value pair storage for winners, like you.",
-  "main": "dist/storage-methods.js",
+  "main": "dist/StorageAPI.js",
   "scripts": {
     "prebuild": "rm -rf dist && mkdir dist",
     "build": "babel src --out-dir dist",

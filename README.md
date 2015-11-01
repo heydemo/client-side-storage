@@ -23,7 +23,7 @@ npm install client-side-storage
 var StorageAPI = require('client-side-storage');
 
 //Optional name 'MyStorage' prevents namespace collisions
-var MyStorage  = new Storage('MyStorage');
+var MyStorage  = new StorageAPI('MyStorage');
 
 MyStorage.addStorageMethod(require('client-side-storage/methods/localStorage');
 
