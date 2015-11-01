@@ -1,5 +1,7 @@
 # client-side-storage
 
+Provides key value pair storage.  Right now only localStorage is implemented.
+
 [![travis build](https://img.shields.io/travis/heydemo/client-side-storage.svg)](https://travis-ci.org/heydemo/client-side-storage)
 
 You want code coverage?  We got code coverage so good it will make your head spin.
@@ -37,6 +39,7 @@ MyStorage.set('stuff', 'things')
 
 ### Set / Retrieve multiple items
 
+```javascript
 MyStorage.set({stuff: 'things', children: 'the future'})
 .then(function() {
   return MyStorage.get(['stuff', 'children']);
@@ -44,19 +47,23 @@ MyStorage.set({stuff: 'things', children: 'the future'})
 .then(function(obj) {
   console.log(obj); // {stuff: 'things', children: 'the future'}
 });
+```
 
 ### Remove item
+```javascript
 MyStorage.remove('stuff')
 .then(function() {
   console.log('stuff is gone');
 });
+```
 
 ### Clear storage
+```javascript
 MyStorage.clear()
 .then(function() {
   console.log('the past is dead, hoss...');
 });
-
+```
 
 ## Implement your own Storage Method
 
@@ -86,7 +93,7 @@ class MyStorageMethod() {
   getMultiple(array_of_values) {
     //getMultiple will be called when Storage.get is called with an array of values
     //Your class should return an object of key-value pairs (or a promise which resolves to one)
-    return {key1: 'cool_value', key2: 'cool_value2"}
+    return {key1: 'cool_value', key2: 'cool_value2'}
   }
   set(key, value) {
     //set key equal to value in your method
