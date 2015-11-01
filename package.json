@@ -4,6 +4,7 @@
   "description": "Simple, extensible, client-side key/value pair storage for winners, like you.",
   "main": "src/storage-methods.js",
   "scripts": {
+    "commit": "git-cz",
     "test": "mocha tests/tests.js -w --compilers js:babel/register",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
@@ -18,6 +19,8 @@
   "devDependencies": {
     "chai": "3.4.0",
     "chai-as-promised": "5.1.0",
+    "commitizen": "2.3.0",
+    "cz-conventional-changelog": "1.1.4",
     "mocha": "1.21.5",
     "mocha-as-promised": "2.0.0",
     "node-aop": "0.1.0",
@@ -26,5 +29,8 @@
   "dependencies": {
     "localStorage": "^1.0.3",
     "q": "^1.4.1"
+  },
+  "czConfig": {
+    "path": "node_modules/cs-convential-changelog"
   }
 }
