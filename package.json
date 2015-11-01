@@ -9,8 +9,10 @@
     "commit": "./node_modules/commitizen/bin/git-cz",
     "start": "npm run test",
     "test": "mocha tests/tests.js -w --compilers js:babel/register",
-    "test:single": "mocha tests/tests.js --compilers js:babel/register",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "test:single": "./node_modules/istanbul/lib/cli.js cover -x *test* _mocha -- -R spec tests/tests.js --compilers js:babel/register",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "check-coverage": "./node_modules/istanbul/lib/cli.js check-coverage --statements 80 --branches 80 --lines 80 --functions 80",
+    "report-coverage": "cat ./coverage/lcov.info | codecov"
   },
   "author": {
     "name": "John De Mott"
@@ -28,6 +30,7 @@
     "commitizen": "1.0.5",
     "cz-conventional-changelog": "1.1.2",
     "ghooks": "0.3.2",
+    "istanbul": "0.4.0",
     "mocha": "1.21.5",
     "semantic-release": "4.3.5"
   },
@@ -41,7 +44,7 @@
   },
   "config": {
     "ghooks": {
-      "pre-commit": "npm run test:single"
+      "pre-commit": "npm run test:single && npm run check-coverage"
     }
   }
 }
