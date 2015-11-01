@@ -1,4 +1,7 @@
-import Storage from '../src/storage-methods';
+import Storage from '../src/StorageAPI.js';
+import localStorageMethod from '../src/methods/localStorage.js';
+Storage.registerStorageMethod('localStorage', localStorageMethod);
+
 var expect  = require('chai').expect;
 
 
