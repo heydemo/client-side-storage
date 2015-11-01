@@ -11,21 +11,20 @@ var _current_method;
 
 var _init = false;
 
-class Storage {
-  constructor() {
+export default class Storage {
+  constructor(prefix) {
+    this.prefix = prefix;
     this.wrapMethod(this, 'get');
     this.wrapMethod(this, 'set');
     this.wrapMethod(this, 'remove');
     this.wrapMethod(this, 'clear');
   }
-  registerStorageMethod(name, method) {
-    if (typeof(name) !== 'string') {
-      throw new Error('First argument to registerStorageMethod should be name - a string');
+  addStorageMethod(methodClass) {
+    if (typeof(methodClass) !== 'function') {
+      throw new Error('storageMethod must be a function');
     }
-    if (typeof(method) !== 'object') {
-      throw new Error('Second argument to registerStorageMethod should be method - an object');
-    }
-    _storage_methods[name] = method;
+    let method = new methodClass(this.prefix);  
+    _storage_methods[method.name] = method;
   }
   _selectCorrectStorageMethod() {
     for (var name in _storage_methods) {
@@ -117,18 +116,18 @@ class Storage {
     var getType = (typeof(key) == 'object') ? 'getMultiple' : 'get';
     var method = this.getCurrentMethod();
     var args = [...arguments];
-    return method[getType].apply(this, args);
+    return method[getType].apply(method, args);
   }
   set(key, value) {
     var setType = (typeof(key) == 'object') ? 'setMultiple' : 'set';
     var method = this.getCurrentMethod();
     var args = [...arguments];
-    return method[setType].apply(this, args);
+    return method[setType].apply(method, args);
   }
   remove() {
     var method = this.getCurrentMethod();
     var args = [...arguments];
-    return method.remove.apply(this, args);
+    return method.remove.apply(method, args);
   }
   clear() {
     var method = this.getCurrentMethod();
@@ -136,5 +135,3 @@ class Storage {
     return method.clear();
   }
 }
-
-module.exports = new Storage();

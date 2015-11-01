@@ -3,46 +3,49 @@ if (typeof(localStorage) == 'undefined') {
   var localStorage = require('localStorage');
 }
 
-var LocalStorage = {
-  isSupported: function() {
+class LocalStorage {
+  constructor(name) {
+    this.name = name;
+  }
+  isSupported() {
     if (typeof(localStorage) != 'undefined') {
       return true;
     }
-  },
-  get: function(variable) {
-    var value = localStorage.getItem(variable);
+  }
+  get(variable) {
+    var value = localStorage.getItem(this.name +'_'+ variable);
     value = (value == null) ? undefined : JSON.parse(value);
     return value;
-  },
-  set: function(variable, value) {
+  }
+  set(variable, value) {
     value = JSON.stringify(value);
-    localStorage.setItem(variable, value);
+    localStorage.setItem(this.name +'_'+ variable, value);
     return true;
-  },
-  setMultiple: function(obj) {
+  }
+  setMultiple(obj) {
     var value;
     for (var key in obj) {
       value = obj[key];
-      localStorage.setItem(key, JSON.stringify(value));
+      localStorage.setItem(this.name +'_'+ key, JSON.stringify(value));
     }
     return true;
-  },
-  getMultiple: function(keys) {
+  }
+  getMultiple(keys) {
     var values = {};
-    keys.forEach(function(key) {
-      var value = localStorage.getItem(key);
+    keys.forEach((key) => {
+      var value = localStorage.getItem(this.name +'_'+ key);
       value = (value == null) ? undefined : JSON.parse(value);
       values[key] = value;
-    })
+    });
     return values;
-  },
-  remove: function(variable) {
+  }
+  remove(variable) {
     var deferred = Q.defer(); 
-    localStorage.removeItem(variable);
+    localStorage.removeItem(this.name +'_'+ variable);
     deferred.resolve();
     return deferred.promise;
-  },
-  clear: function(variable) {
+  }
+  clear(variable) {
     localStorage.clear();
   }
 }
