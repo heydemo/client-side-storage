@@ -5,7 +5,7 @@
   "main": "dist/storage-methods.js",
   "scripts": {
     "prebuild": "rm -rf dist && mkdir dist",
-    "build": "babel src/storage-methods.js -o dist/storage-methods.js",
+    "build": "babel src -o dist",
     "commit": "./node_modules/commitizen/bin/git-cz",
     "start": "npm run test",
     "test": "mocha tests/tests.js -w --compilers js:babel/register",
