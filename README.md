@@ -25,7 +25,7 @@ var StorageAPI = require('client-side-storage');
 //Optional name 'MyStorage' prevents namespace collisions
 var MyStorage  = new StorageAPI('MyStorage');
 
-MyStorage.addStorageMethod(require('client-side-storage/methods/localStorage');
+MyStorage.addStorageMethod(require('client-side-storage/dist/methods/localStorage'));
 
 MyStorage.set('stuff', 'things')
 .then(function() {
@@ -47,6 +47,11 @@ MyStorage.set({stuff: 'things', children: 'the future'})
 .then(function(obj) {
   console.log(obj); // {stuff: 'things', children: 'the future'}
 });
+
+
+
+
+
 ```
 
 ### Remove item
