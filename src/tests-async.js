@@ -1,9 +1,15 @@
-var Storage = require('./storage-methods');
+import Storage from '../src/storage-methods';
+require('mocha-as-promised')();
+var chai = require('chai');
+var chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
+var expect  = chai.expect;
+var Q = require('q');
 
 
-  QUnit.test("Storage - Save and retrieve value", function(assert) {
-    var done  = assert.async();
-    Storage.init()
+describe('client-side-storage', function() {
+  it("Should be able to save and retrieve a value", function() {
+    return Storage.init()
     .then(function() {
       return Storage.clear();
     })
@@ -14,13 +20,12 @@ var Storage = require('./storage-methods');
       return Storage.get('test_value');
     })
     .then(function(value) {
-      assert.equal(value, 'test me');
-      done();
+       return result.should.equal(5); 
     });
+
   });
 
-  QUnit.test("Storage - update existing value", function(assert) {
-    var done  = assert.async();
+  it("should be able to update an existing value", function() {
     Storage.init()
     .then(function() {
       return Storage.clear();
@@ -35,13 +40,12 @@ var Storage = require('./storage-methods');
       return Storage.get('test_value');
     })
     .then(function(value) {
-      assert.equal(value, 'updated value');
+      expect(value).to.equal('updated value');
       done();
     });
   });
 
-  QUnit.test("Storage - remove existing value", function(assert) {
-    var done  = assert.async();
+  it("should be able to remove an existing value", function() {
     Storage.init()
     .then(function() {
       return Storage.clear();
@@ -56,14 +60,13 @@ var Storage = require('./storage-methods');
       return Storage.get('test_value');
     })
     .then(function(value) {
-      assert.equal(value, undefined);
+      expect(value).to.equal(undefined);
       done();
     });
   });
 
   var test_value, test_value2;
-  QUnit.test("Storage - clear values", function(assert) {
-    var done  = assert.async();
+  it("should be able to clear all values", function() {
     Storage.init()
     .then(function() {
       return Storage.clear();
@@ -86,15 +89,14 @@ var Storage = require('./storage-methods');
     })
     .then(function(value) {
       test_value2 = value;
-      assert.equal(test_value, undefined);
-      assert.equal(test_value2, undefined);
+      expect(test_value).to.equal(undefined);
+      expect(test_value2).to.equal(undefined);
       done();
     });
   });
 
-  QUnit.test("Storage - test setting multiple values with an object", function(assert) {
+  it("should be able to set multiple values with an object", function() {
     var test_value, test_value2;
-    var done  = assert.async();
     Storage.init()
     .then(function() {
       return Storage.clear();
@@ -111,15 +113,14 @@ var Storage = require('./storage-methods');
     })
     .then(function(value) {
       test_value2 = value;
-      assert.equal(test_value, 'test me');
-      assert.equal(test_value2, 'another test');
+      expect(test_value).to.equal('test me');
+      expect(test_value2).to.equal('another test');
       done();
     });
   });
 
-  QUnit.test("Storage - get multiple values", function(assert) {
+  it("should get multiple values", function() {
     var test_value, test_value2;
-    var done  = assert.async();
     Storage.init()
     .then(function() {
       return Storage.clear();
@@ -131,13 +132,12 @@ var Storage = require('./storage-methods');
       return Storage.get(['test_value', 'test_value2']);
     })
     .then(function(values) {
-      assert.deepEqual(values, {'test_value': 'test me', 'test_value2': 'another test'});
+      expect(values).to.deep.equal({'test_value': 'test me', 'test_value2': 'another test'});
       done();
     });
   });
 
-  QUnit.test("Storage - test getting multiple values which should all be undefined", function(assert) {
-    var done  = assert.async();
+  it("should return multiple values which should all be undefined", function() {
     Storage.init()
     .then(function() {
       return Storage.clear();
@@ -146,10 +146,8 @@ var Storage = require('./storage-methods');
       return Storage.get(['test_value', 'test_value2', 'test_value3']);
     })
     .then(function(values) {
-      assert.deepEqual(values, {'test_value': undefined, 'test_value2': undefined, 'test_value3': undefined});
+      expect(values).to.deep.equal({'test_value': undefined, 'test_value2': undefined, 'test_value3': undefined});
       done();
     });
   });
-
-
-
+});

@@ -1,10 +1,11 @@
 {
   "name": "client-side-storage",
-  "version": "1.0.8",
+  "version": "0.0.0-semantically-released",
   "description": "Simple, extensible, client-side key/value pair storage for winners, like you.",
   "main": "src/storage-methods.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests/tests.js -w --compilers js:babel/register",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": {
     "name": "John De Mott"
@@ -14,7 +15,14 @@
     "url": "https://github.com/heydemo/client-side-storage"
   },
   "license": "ISC",
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "3.4.0",
+    "chai-as-promised": "5.1.0",
+    "mocha": "1.21.5",
+    "mocha-as-promised": "2.0.0",
+    "node-aop": "0.1.0",
+    "semantic-release": "^4.3.5"
+  },
   "dependencies": {
     "localStorage": "^1.0.3",
     "q": "^1.4.1"

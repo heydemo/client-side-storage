@@ -2,10 +2,10 @@ var Q = require('q');
 var _db;
 
 var dbInitialize = function(tx) {
-  tx.executeSql('CREATE TABLE IF NOT EXISTS bliss_storage (key, value, dataType)');
+  tx.executeSql('CREATE TABLE IF NOT EXISTS client_side_storage (key, value, dataType)');
 };
 
-var dbError: function(err) {
+var dbError = function(err) {
   console.log("SQL Error: " + err.message);
 }
 
@@ -13,7 +13,7 @@ var PhonegapStorage = {
   init: function() {
     _db = window.openDatabase("BlissDB", "1.0", "Bliss: Bliss App DB",	50000);
     _db.transaction(Storage.dbInitialize, Storage.dbError);
-  }
+  },
   isSupported: function() {
     return false;
   },

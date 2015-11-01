@@ -10,36 +10,31 @@ var LocalStorage = {
     }
   },
   get: function(variable) {
-    var deferred = Q.defer();
     var value = localStorage.getItem(variable);
     value = (value == null) ? undefined : JSON.parse(value);
-    deferred.resolve(value);
-    return deferred.promise;
+    return value;
   },
   set: function(variable, value) {
     value = JSON.stringify(value);
-    var deferred = Q.defer(); 
     localStorage.setItem(variable, value);
-    deferred.resolve();
-    return deferred.promise;
+    return true;
   },
   setMultiple: function(obj) {
     var value;
     for (var key in obj) {
       value = obj[key];
-      Storage.set(key, value);
+      localStorage.setItem(key, JSON.stringify(value));
     }
+    return true;
   },
   getMultiple: function(keys) {
-    var deferred = Q.defer(); 
     var values = {};
     keys.forEach(function(key) {
       var value = localStorage.getItem(key);
       value = (value == null) ? undefined : JSON.parse(value);
       values[key] = value;
     })
-    deferred.resolve(values);
-    return deferred.promise;
+    return values;
   },
   remove: function(variable) {
     var deferred = Q.defer(); 
@@ -48,10 +43,7 @@ var LocalStorage = {
     return deferred.promise;
   },
   clear: function(variable) {
-    var deferred = Q.defer(); 
     localStorage.clear();
-    deferred.resolve();
-    return deferred.promise;
   }
 }
 

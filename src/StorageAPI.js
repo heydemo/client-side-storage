@@ -11,8 +11,14 @@ var _current_method;
 
 var _init = false;
 
-Storage = {
-  registerStorageMethod: function(name, method) {
+class Storage {
+  constructor() {
+    this.wrapMethod(this, 'get');
+    this.wrapMethod(this, 'set');
+    this.wrapMethod(this, 'remove');
+    this.wrapMethod(this, 'clear');
+  }
+  registerStorageMethod(name, method) {
     if (typeof(name) !== 'string') {
       throw new Error('First argument to registerStorageMethod should be name - a string');
     }
@@ -20,13 +26,9 @@ Storage = {
       throw new Error('Second argument to registerStorageMethod should be method - an object');
     }
     _storage_methods[name] = method;
-  },
-  _selectCorrectStorageMethod: function() {
+  }
+  _selectCorrectStorageMethod() {
     for (var name in _storage_methods) {
-      console.log('NAME');
-      console.log(name);
-      console.log('END NAME');
-      console.log(_storage_methods);
       var storage_method = _storage_methods[name];
       if (storage_method.isSupported()) {
         _current_method = name;
@@ -35,67 +37,104 @@ Storage = {
     if (!_current_method) {
       throw new Error('No supported storage methods found!');
     }
-  },
-  _getCurrentMethod: function() {
+  }
+  getCurrentMethod() {
     return _storage_methods[_current_method]
-  },
-  ensureInit: function() {
-    if (!_init) {
-      throw new Error('You must call Storage.init before using Storage');
-    }
-  },
-  init: function() {
-    Storage._selectCorrectStorageMethod();
-
-    var promise;
-    var method = Storage._getCurrentMethod();
-    var args = Array.prototype.slice.apply(arguments);
-
-    if (method.init) {
-      promise = method.init.apply(null, args);
-    }
-
-    _init = true;
-
-    if (promise) {
-      return promise;
+  }
+  /*
+   *  Wrapper function which ensures we always return a promise
+   */
+  returnPromise(value) {
+    if (this._isPromise(value)) {
+      return value;
     }
     else {
       var deferred = Q.defer();
-      deferred.resolve();
+      deferred.resolve(value);
       return deferred.promise;
     }
-  },
-  get: function(key) {
-    Storage.ensureInit();
+  }
+  _isPromise(value) {
+    return (typeof(value) == 'object' && typeof(value.then) === 'function');
+  }
+  init() {
+    var deferred = Q.defer();
+    this._selectCorrectStorageMethod();
 
+    var promise;
+    var method = this.getCurrentMethod();
+    var args = Array.from(arguments);
+
+    if (typeof(method.init) === 'function') {
+      this.returnPromise(method.init.apply(null, args))
+      .then((value) => {
+        _init = true;
+        deferred.resolve(value);
+      });
+    }
+    else {
+      _init = true;
+      deferred.resolve(true);
+    }
+
+    return deferred.promise;
+
+  }
+  ensureInit() {
+    if (!_init) {
+      return this.init();
+    }
+    else {
+      return this.returnPromise(true);
+    }
+  }
+  wrapMethod(obj, method_name) {
+    var original_method = obj[method_name];
+    var that = this;
+    obj[method_name] = function() {
+
+      var deferred = Q.defer();
+      var args = Array.from(arguments);
+
+      obj.ensureInit()
+      .then(function() {
+        try {
+          var return_value = original_method.apply(obj, args);
+          return obj.returnPromise(return_value);
+        }
+        catch(error) {
+          console.log('Error in StorageMethod.'+ method_name +' : ' + error);
+        }
+      })
+      .then(function(resolved_value) {
+        deferred.resolve(resolved_value);
+      });
+
+      return deferred.promise;
+    }
+  }
+  get(key) {
     var getType = (typeof(key) == 'object') ? 'getMultiple' : 'get';
-
-    var method = Storage._getCurrentMethod();
-    var args = Array.prototype.slice.apply(arguments);
-    return method[getType].apply(null, args);
-  },
-  set: function(key, value) {
-    Storage.ensureInit();
-
+    var method = this.getCurrentMethod();
+    var args = Array.from(arguments);
+    return method[getType].apply(this, args);
+  }
+  set(key, value) {
     var setType = (typeof(key) == 'object') ? 'setMultiple' : 'set';
-
-    var method = Storage._getCurrentMethod();
-    var args = Array.prototype.slice.apply(arguments);
-    return method[setType].apply(null, args);
-  },
-  remove: function() {
-    Storage.ensureInit();
-    var method = Storage._getCurrentMethod();
-    var args = Array.prototype.slice.apply(arguments);
-    return method.remove.apply(null, args);
-  },
-  clear: function() {
-    Storage.ensureInit();
-    var method = Storage._getCurrentMethod();
-    var args = Array.prototype.slice.apply(arguments);
+    var method = this.getCurrentMethod();
+    var args = Array.from(arguments);
+    return method[setType].apply(this, args);
+  }
+  remove() {
+    var method = this.getCurrentMethod();
+    var args = Array.from(arguments);
+    return method.remove.apply(this, args);
+  }
+  clear() {
+    var method = this.getCurrentMethod();
+    var args = Array.from(arguments);
     return method.clear();
   }
 }
 
-module.exports = Storage; //asdfasdfasdfsd
+module.exports = new Storage();
