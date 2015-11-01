@@ -63,7 +63,7 @@ class Storage {
 
     var promise;
     var method = this.getCurrentMethod();
-    var args = Array.from(arguments);
+    var args = [...arguments];
 
     if (typeof(method.init) === 'function') {
       this.returnPromise(method.init.apply(null, args))
@@ -94,7 +94,7 @@ class Storage {
     obj[method_name] = function() {
 
       var deferred = Q.defer();
-      var args = Array.from(arguments);
+      var args = [...arguments];
 
       obj.ensureInit()
       .then(function() {
@@ -116,23 +116,23 @@ class Storage {
   get(key) {
     var getType = (typeof(key) == 'object') ? 'getMultiple' : 'get';
     var method = this.getCurrentMethod();
-    var args = Array.from(arguments);
+    var args = [...arguments];
     return method[getType].apply(this, args);
   }
   set(key, value) {
     var setType = (typeof(key) == 'object') ? 'setMultiple' : 'set';
     var method = this.getCurrentMethod();
-    var args = Array.from(arguments);
+    var args = [...arguments];
     return method[setType].apply(this, args);
   }
   remove() {
     var method = this.getCurrentMethod();
-    var args = Array.from(arguments);
+    var args = [...arguments];
     return method.remove.apply(this, args);
   }
   clear() {
     var method = this.getCurrentMethod();
-    var args = Array.from(arguments);
+    var args = [...arguments];
     return method.clear();
   }
 }
