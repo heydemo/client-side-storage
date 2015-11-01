@@ -116,7 +116,7 @@ describe('client-side-storage', function() {
       console.log(error);
     });
   });
-  it("should get multiple values", function(done) {
+  it("should get multiple values with an array of keys", function(done) {
     var test_value, test_value2;
     Storage.init()
     .then(function() {
