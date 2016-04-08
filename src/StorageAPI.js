@@ -73,6 +73,9 @@ export default class Storage {
       .then((value) => {
         this._init = true;
         deferred.resolve(value);
+      })
+      .catch((error) => {
+        console.log(error);
       });
     }
     else {

@@ -1,6 +1,6 @@
 {
   "name": "@heydemo/storage",
-  "version": "1.0.0"
+  "version": "1.0.0",
   "description": "Simple, extensible, client-side key/value pair storage for winners, like you.",
   "main": "dist/StorageAPI.js",
   "scripts": {
@@ -33,12 +33,15 @@
     "istanbul": "0.4.0",
     "mocha": "1.21.5",
     "node-babel": "0.1.2",
-    "semantic-release": "4.3.5"
+    "randomstring": "1.1.4",
+    "semantic-release": "4.3.5",
+    "websql": "0.4.3"
   },
   "dependencies": {
     "localStorage": "^1.0.3",
     "node-aop": "0.1.0",
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "websql-promisified": "1.0.3"
   },
   "czConfig": {
     "path": "node_modules/cz-conventional-changelog"
