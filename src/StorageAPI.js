@@ -5,40 +5,44 @@
 
 var Q = require('q');
 
-var _storage_methods = {};
 
-var _current_method;
-
-var _init = false;
 
 export default class Storage {
   constructor(prefix) {
+    this._subscribers = [];
     this.prefix = prefix;
     this.wrapMethod(this, 'get');
-    this.wrapMethod(this, 'set');
     this.wrapMethod(this, 'remove');
     this.wrapMethod(this, 'clear');
+    this.subscribe = this.subscribe.bind(this);
+    this.notifySubscribers = this.notifySubscribers.bind(this);
+    this._init = false;
+    this._current_method = false;
+    this._storage_methods = [];
   }
   addStorageMethod(methodClass) {
     if (typeof(methodClass) !== 'function') {
       throw new Error('storageMethod must be a function');
     }
     let method = new methodClass(this.prefix);  
-    _storage_methods[method.name] = method;
+    this._storage_methods[method.name] = method;
   }
   _selectCorrectStorageMethod() {
-    for (var name in _storage_methods) {
-      var storage_method = _storage_methods[name];
+    for (var name in this._storage_methods) {
+      var storage_method = this._storage_methods[name];
       if (storage_method.isSupported()) {
-        _current_method = name;
+        this._current_method = name;
       }
     }
-    if (!_current_method) {
+    if (!this._current_method) {
       throw new Error('No supported storage methods found!');
     }
   }
   getCurrentMethod() {
-    return _storage_methods[_current_method]
+    if (!this._current_method) {
+      throw new Error('Current method is not yet selected!');
+    }
+    return this._storage_methods[this._current_method];
   }
   /*
    *  Wrapper function which ensures we always return a promise
@@ -67,12 +71,12 @@ export default class Storage {
     if (typeof(method.init) === 'function') {
       this.returnPromise(method.init.apply(null, args))
       .then((value) => {
-        _init = true;
+        this._init = true;
         deferred.resolve(value);
       });
     }
     else {
-      _init = true;
+      this._init = true;
       deferred.resolve(true);
     }
 
@@ -80,7 +84,7 @@ export default class Storage {
 
   }
   ensureInit() {
-    if (!_init) {
+    if (!this._init) {
       return this.init();
     }
     else {
@@ -119,10 +123,23 @@ export default class Storage {
     return method[getType].apply(method, args);
   }
   set(key, value) {
+    var deferred = Q.defer();
     var setType = (typeof(key) == 'object') ? 'setMultiple' : 'set';
-    var method = this.getCurrentMethod();
     var args = [...arguments];
-    return method[setType].apply(method, args);
+    var that = this;
+    this.ensureInit()
+    .then(function() {
+      var method = that.getCurrentMethod();
+      return that.returnPromise(method[setType].apply(method, args));
+    })
+    .then((returnedValue) => {
+      deferred.resolve(returnedValue);
+      this.notifySubscribers(args);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    return deferred.promise;
   }
   remove() {
     var method = this.getCurrentMethod();
@@ -133,5 +150,26 @@ export default class Storage {
     var method = this.getCurrentMethod();
     var args = [...arguments];
     return method.clear();
+  }
+  subscribe(callback) {
+    this._subscribers.push({ callback });
+  }
+  notifySubscribers(args) {
+    var keyValueObj = this.formatArgsAsKeyValueObj(args);
+    this._subscribers.forEach((subscriber) => {
+      subscriber.callback(keyValueObj);
+    });
+  }
+  formatArgsAsKeyValueObj(args) {
+    let type = typeof(args[0]);
+    let simple_types = ['string', 'number'];
+    if (simple_types.indexOf(type) == -1) {
+      return args; 
+    }
+    else {
+      let key = args[0];
+      let value = args[1];
+      return { [key]: value };
+    }
   }
 }
