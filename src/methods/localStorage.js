@@ -3,7 +3,7 @@ if (typeof(localStorage) == 'undefined') {
   var localStorage = require('localStorage');
 }
 
-class LocalStorage {
+export default class LocalStorage {
   constructor(name) {
     this.name = name;
   }
@@ -50,4 +50,3 @@ class LocalStorage {
   }
 }
 
-module.exports = LocalStorage;

@@ -36,16 +36,37 @@ export default class SQLLite {
       tx.executeSql(`SELECT * FROM ${this.label} WHERE key = '${variable}'`, []);
     })
     .then((results) => {
-      if (!results[0].rows.length) {
+      let rows = this.getSqlResultRows(results[0]);
+      if (!rows.length) {
         return;
       }
       else {
-        return JSON.parse(results[0].rows._array[0].value);
+        return JSON.parse(rows[0].value);
       }
     })
     .catch((error) => {
       console.log(error);
     });
+  }
+  /**
+   *  Deal with inconsistencies webSQL implementations  
+   */
+  getSqlResultRows(result) {
+    let sql_rows, return_rows = [];
+    if (result) {
+      if (result.rows && result.rows._array) {
+        sql_rows = result.rows._array;
+      }
+      else if (result.rows.length) {
+        sql_rows = result.rows;
+      }
+    }
+    if (sql_rows) {
+      for (var count = 0; count < sql_rows.length; count++) {
+        return_rows.push(sql_rows[String(count)]);
+      }
+    }
+    return return_rows;
   }
   exists(variable) {
     return this.get(variable)
