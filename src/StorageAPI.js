@@ -6,7 +6,6 @@
 var Q = require('q');
 
 
-
 export default class Storage {
   constructor(prefix) {
     this._subscribers = [];

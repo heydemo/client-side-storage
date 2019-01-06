@@ -11,11 +11,32 @@ export default class SQLLite {
     let openDatabase = this.getOpenDatabaseFunction();
     this._db = openDatabase(this.label, "1.0", "Bliss: Bliss App DB", 50000);
     this._db = webSqlPromise(this._db);
-    return this.createTable();
+    if (!this.tablesCreated()) {
+      return this.createTable();
+    }
+    else {
+      let deferred = Q.defer();
+      deferred.resolve();
+      return deferred.promise;
+    }
+  }
+  tablesCreated() {
+    if (typeof localStorage !== 'undefined') {
+      return !!localStorage.getItem(`runway_${this.name}_tables_created`);
+    }
+    return false;
+  }
+  setTableCreated() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(`runway_${this.name}_tables_created`, true);
+    }
   }
   createTable() {
     return this._db.transaction((tx) => {
       tx.executeSql(`CREATE TABLE IF NOT EXISTS ${this.label} (key, value, dataType)`, []);
+    })
+    .then(() => {
+      this.setTableCreated();
     });
   }
   getOpenDatabaseFunction() {

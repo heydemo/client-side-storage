@@ -31,7 +31,29 @@ var SQLLite = (function () {
       var openDatabase = this.getOpenDatabaseFunction();
       this._db = openDatabase(this.label, "1.0", "Bliss: Bliss App DB", 50000);
       this._db = (0, _websqlPromisified2.default)(this._db);
-      return this.createTable();
+      if (!this.tablesCreated()) {
+        return this.createTable();
+      } else {
+        console.log('tables already created');
+        var deferred = Q.defer();
+        deferred.resolve();
+        return deferred.promise;
+      }
+    }
+  }, {
+    key: 'tablesCreated',
+    value: function tablesCreated() {
+      if (typeof localStorage !== 'undefined') {
+        return !!localStorage.getItem('runway_' + this.name + '_tables_created');
+      }
+      return false;
+    }
+  }, {
+    key: 'setTableCreated',
+    value: function setTableCreated() {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('runway_' + this.name + '_tables_created', true);
+      }
     }
   }, {
     key: 'createTable',
@@ -40,6 +62,8 @@ var SQLLite = (function () {
 
       return this._db.transaction(function (tx) {
         tx.executeSql('CREATE TABLE IF NOT EXISTS ' + _this.label + ' (key, value, dataType)', []);
+      }).then(function () {
+        _this.setTableCreated();
       });
     }
   }, {
@@ -66,14 +90,38 @@ var SQLLite = (function () {
       return this._db.transaction(function (tx) {
         tx.executeSql('SELECT * FROM ' + _this2.label + ' WHERE key = \'' + variable + '\'', []);
       }).then(function (results) {
-        if (!results[0].rows.length) {
+        var rows = _this2.getSqlResultRows(results[0]);
+        if (!rows.length) {
           return;
         } else {
-          return JSON.parse(results[0].rows._array[0].value);
+          return JSON.parse(rows[0].value);
         }
       }).catch(function (error) {
         console.log(error);
       });
+    }
+    /**
+     *  Deal with inconsistencies webSQL implementations  
+     */
+
+  }, {
+    key: 'getSqlResultRows',
+    value: function getSqlResultRows(result) {
+      var sql_rows = undefined,
+          return_rows = [];
+      if (result) {
+        if (result.rows && result.rows._array) {
+          sql_rows = result.rows._array;
+        } else if (result.rows.length) {
+          sql_rows = result.rows;
+        }
+      }
+      if (sql_rows) {
+        for (var count = 0; count < sql_rows.length; count++) {
+          return_rows.push(sql_rows[String(count)]);
+        }
+      }
+      return return_rows;
     }
   }, {
     key: 'exists',
